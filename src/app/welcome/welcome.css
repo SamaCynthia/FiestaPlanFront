@@ -1,0 +1,26 @@
+/* Estilos y animaciones locales para la página de bienvenida */
+
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-8px);
+  }
+}
+
+.animate-float {
+  animation: float 4s ease-in-out infinite;
+}
+
+/* Efectos de transición suaves */
+.glass-panel-hover {
+  will-change: transform, background-color, border-color, box-shadow;
+}
+
+/* Estilo para los gradientes en el fondo */
+header {
+  border-top: none;
+  border-left: none;
+  border-right: none;
+}
