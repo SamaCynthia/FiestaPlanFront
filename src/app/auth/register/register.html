@@ -1,0 +1,222 @@
+<div class="min-h-screen flex flex-col justify-between selection:bg-primary selection:text-white">
+  <header
+    role="banner"
+    class="glass-panel sticky top-0 z-50 px-6 py-4 md:px-12 flex items-center justify-between"
+  >
+    <a routerLink="/" class="flex items-center gap-2">
+      <span
+        class="text-2xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent tracking-tight"
+        >FiestaPlan</span
+      >
+    </a>
+    <nav class="flex gap-4">
+      <a
+        routerLink="/login"
+        class="px-4 py-2 text-sm font-medium text-zinc-300 hover:text-white transition-colors duration-200"
+        >Iniciar Sesión</a
+      >
+    </nav>
+  </header>
+
+  <main role="main" class="flex-grow flex items-center justify-center px-4 py-16">
+    <div class="glass-panel w-full max-w-md p-8 rounded-2xl">
+      <h1 class="text-2xl md:text-3xl font-extrabold text-white mb-2 text-center">
+        Crea tu cuenta
+      </h1>
+      <p class="text-zinc-400 text-sm text-center mb-8 font-light">
+        Empieza a planificar tus eventos con FiestaPlan
+      </p>
+
+      <form [formGroup]="form" (ngSubmit)="onSubmit()" class="space-y-5" novalidate>
+        <div class="grid grid-cols-2 gap-4">
+          <div>
+            <label for="nombres" class="block text-sm font-medium text-zinc-300 mb-1.5"
+              >Nombres</label
+            >
+            <input
+              id="nombres"
+              type="text"
+              formControlName="nombres"
+              autocomplete="given-name"
+              class="w-full px-4 py-3 rounded-xl bg-zinc-800/50 border border-zinc-700/50 text-white placeholder-zinc-500 focus:outline-none focus:border-primary transition-colors duration-200"
+              placeholder="Nombre"
+            />
+            @if (nombres.invalid && nombres.touched) {
+              <p class="text-red-400 text-xs mt-1.5">Requerido</p>
+            }
+          </div>
+
+          <div>
+            <label for="apellidos" class="block text-sm font-medium text-zinc-300 mb-1.5"
+              >Apellidos</label
+            >
+            <input
+              id="apellidos"
+              type="text"
+              formControlName="apellidos"
+              autocomplete="family-name"
+              class="w-full px-4 py-3 rounded-xl bg-zinc-800/50 border border-zinc-700/50 text-white placeholder-zinc-500 focus:outline-none focus:border-primary transition-colors duration-200"
+              placeholder="Apellido"
+            />
+            @if (apellidos.invalid && apellidos.touched) {
+              <p class="text-red-400 text-xs mt-1.5">Requerido</p>
+            }
+          </div>
+        </div>
+
+        <div>
+          <label for="correo" class="block text-sm font-medium text-zinc-300 mb-1.5"
+            >Correo electrónico</label
+          >
+          <input
+            id="correo"
+            type="email"
+            formControlName="correo"
+            autocomplete="email"
+            class="w-full px-4 py-3 rounded-xl bg-zinc-800/50 border border-zinc-700/50 text-white placeholder-zinc-500 focus:outline-none focus:border-primary transition-colors duration-200"
+            placeholder="tucorreo@gmail.com"
+          />
+          @if (correo.invalid && correo.touched) {
+            <p class="text-red-400 text-xs mt-1.5">
+              @if (correo.errors?.['required']) {
+                El correo es obligatorio.
+              } @else if (correo.errors?.['email']) {
+                Ingresa un correo válido.
+              }
+            </p>
+          }
+        </div>
+
+        <div>
+          <label for="fecha_nacimiento" class="block text-sm font-medium text-zinc-300 mb-1.5"
+            >Fecha de nacimiento</label
+          >
+          <input
+            id="fecha_nacimiento"
+            type="date"
+            formControlName="fecha_nacimiento"
+            class="w-full px-4 py-3 rounded-xl bg-zinc-800/50 border border-zinc-700/50 text-white placeholder-zinc-500 focus:outline-none focus:border-primary transition-colors duration-200"
+          />
+          @if (fecha_nacimiento.invalid && fecha_nacimiento.touched) {
+            <p class="text-red-400 text-xs mt-1.5">Este campo es obligatorio.</p>
+          }
+        </div>
+
+        <div>
+          <label for="genero" class="block text-sm font-medium text-zinc-300 mb-1.5">
+            Género <span class="text-zinc-500 font-normal">(opcional)</span>
+          </label>
+          <select
+            id="genero"
+            formControlName="genero"
+            class="w-full px-4 py-3 rounded-xl bg-zinc-800/50 border border-zinc-700/50 text-white focus:outline-none focus:border-primary transition-colors duration-200"
+          >
+            <option value="" class="bg-zinc-800">Selecciona una opción</option>
+            @for (opcion of opcionesGenero; track opcion.value) {
+              <option [value]="opcion.value" class="bg-zinc-800">{{ opcion.label }}</option>
+            }
+          </select>
+        </div>
+
+        <div>
+          <label for="telefono" class="block text-sm font-medium text-zinc-300 mb-1.5">
+            Teléfono <span class="text-zinc-500 font-normal">(opcional)</span>
+          </label>
+          <input
+            id="telefono"
+            type="tel"
+            formControlName="telefono"
+            autocomplete="tel"
+            class="w-full px-4 py-3 rounded-xl bg-zinc-800/50 border border-zinc-700/50 text-white placeholder-zinc-500 focus:outline-none focus:border-primary transition-colors duration-200"
+            placeholder="XXXX XXX XXXX"
+          />
+        </div>
+
+        <div>
+          <label for="ciudad_residencia" class="block text-sm font-medium text-zinc-300 mb-1.5">
+            Ciudad de residencia <span class="text-zinc-500 font-normal">(opcional)</span>
+          </label>
+          <input
+            id="ciudad_residencia"
+            type="text"
+            formControlName="ciudad_residencia"
+            autocomplete="address-level2"
+            class="w-full px-4 py-3 rounded-xl bg-zinc-800/50 border border-zinc-700/50 text-white placeholder-zinc-500 focus:outline-none focus:border-primary transition-colors duration-200"
+            placeholder="Ciudad de residencia"
+          />
+        </div>
+
+        <div>
+          <label for="password" class="block text-sm font-medium text-zinc-300 mb-1.5"
+            >Contraseña</label
+          >
+          <input
+            id="password"
+            type="password"
+            formControlName="password"
+            autocomplete="new-password"
+            class="w-full px-4 py-3 rounded-xl bg-zinc-800/50 border border-zinc-700/50 text-white placeholder-zinc-500 focus:outline-none focus:border-primary transition-colors duration-200"
+            placeholder="Mínimo 8 caracteres"
+          />
+          @if (password.invalid && password.touched) {
+            <p class="text-red-400 text-xs mt-1.5">
+              @if (password.errors?.['required']) {
+                La contraseña es obligatoria.
+              } @else if (password.errors?.['minlength']) {
+                Debe tener al menos 8 caracteres.
+              }
+            </p>
+          }
+        </div>
+
+        <div class="flex items-start gap-3 pt-1">
+          <input
+            id="aceptaAviso"
+            type="checkbox"
+            formControlName="aceptaAviso"
+            class="mt-1 w-4 h-4 rounded border-zinc-700 bg-zinc-800/50 text-primary focus:ring-primary focus:ring-offset-0 cursor-pointer"
+          />
+          <label for="aceptaAviso" class="text-sm text-zinc-300 font-light cursor-pointer">
+            He leído y acepto el
+            <button
+              type="button"
+              (click)="abrirModalAviso($event)"
+              class="text-primary hover:underline font-medium"
+            >
+              Aviso de Privacidad
+            </button>
+            y autorizo el tratamiento de mis datos personales conforme a lo descrito.
+          </label>
+        </div>
+        @if (aceptaAviso.invalid && aceptaAviso.touched) {
+          <p class="text-red-400 text-xs -mt-3">
+            Debes aceptar el aviso de privacidad para continuar.
+          </p>
+        }
+
+        <button
+          type="submit"
+          [disabled]="cargando() || form.invalid"
+          class="w-full px-6 py-3.5 bg-gradient-to-r from-primary to-accent hover:from-primary-hover hover:to-accent text-white font-semibold rounded-xl shadow-lg hover:shadow-primary/30 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+        >
+          @if (cargando()) {
+            Creando cuenta...
+          } @else {
+            Registrarse
+          }
+        </button>
+      </form>
+
+      <p class="text-center text-sm text-zinc-400 mt-6 font-light">
+        ¿Ya tienes cuenta?
+        <a routerLink="/login" class="text-primary hover:underline font-medium">Inicia sesión</a>
+      </p>
+    </div>
+  </main>
+
+  <app-modal-aviso-privacidad
+    [visible]="mostrarModalAviso()"
+    (cerrar)="cerrarModalAviso()"
+    (aceptar)="aceptarDesdeModal()"
+  />
+</div>

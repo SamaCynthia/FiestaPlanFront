@@ -1,0 +1,99 @@
+<div class="min-h-screen flex flex-col justify-between selection:bg-primary selection:text-white">
+  <header role="banner" class="glass-panel sticky top-0 z-50 px-6 py-4 md:px-12 flex items-center justify-between">
+    <a routerLink="/" class="flex items-center gap-2">
+      <span class="text-2xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent tracking-tight">FiestaPlan</span>
+    </a>
+    <nav class="flex gap-4">
+      <a routerLink="/registro" class="glass-panel px-4 py-2 text-sm font-medium text-white hover:bg-white/10 hover:border-white/20 transition-all duration-200">Registrarse</a>
+    </nav>
+  </header>
+
+  <main role="main" class="flex-grow flex items-center justify-center px-4 py-16">
+    <div class="glass-panel w-full max-w-md p-8 rounded-2xl">
+      <h1 class="text-2xl md:text-3xl font-extrabold text-white mb-2 text-center">
+        Inicia sesión
+      </h1>
+      <p class="text-zinc-400 text-sm text-center mb-8 font-light">
+        Bienvenido de vuelta a FiestaPlan
+      </p>
+
+      <p class="text-xs text-zinc-400 text-center mb-6 font-light">
+        Al continuar, confirmas que has leído nuestro
+        <button type="button" (click)="abrirModalAviso($event)" class="text-primary hover:underline">Aviso de Privacidad</button>.
+      </p>
+
+      <form [formGroup]="form" (ngSubmit)="onSubmit()" class="space-y-5" novalidate>
+        <div>
+          <label for="correo" class="block text-sm font-medium text-zinc-300 mb-1.5">Correo electrónico</label>
+          <input
+            id="correo"
+            type="email"
+            formControlName="correo"
+            autocomplete="email"
+            class="w-full px-4 py-3 rounded-xl bg-zinc-800/50 border border-zinc-700/50 text-white placeholder-zinc-500 focus:outline-none focus:border-primary transition-colors duration-200"
+            placeholder="tucorreo@ejemplo.com"
+          />
+          @if (correo.invalid && correo.touched) {
+            <p class="text-red-400 text-xs mt-1.5">
+              @if (correo.errors?.['required']) { El correo es obligatorio. }
+              @else if (correo.errors?.['email']) { Ingresa un correo válido. }
+            </p>
+          }
+        </div>
+
+        <div>
+          <label for="password" class="block text-sm font-medium text-zinc-300 mb-1.5">Contraseña</label>
+          <div class="relative">
+            <input
+              id="password"
+              [type]="mostrarPassword() ? 'text' : 'password'"
+              formControlName="password"
+              autocomplete="current-password"
+              class="w-full px-4 py-3 pr-12 rounded-xl bg-zinc-800/50 border border-zinc-700/50 text-white placeholder-zinc-500 focus:outline-none focus:border-primary transition-colors duration-200"
+              placeholder="••••••••"
+            />
+            <button
+              type="button"
+              (click)="toggleMostrarPassword()"
+              [attr.aria-label]="mostrarPassword() ? 'Ocultar contraseña' : 'Mostrar contraseña'"
+              class="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-400 hover:text-white transition-colors duration-200"
+            >
+              @if (mostrarPassword()) {
+                <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M3.98 8.223A10.477 10.477 0 001.5 12c0 .184.03.36.084.524A11.978 11.978 0 0012 20.25c1.782 0 3.454-.464 4.905-1.278M6.228 6.228A10.45 10.45 0 0112 3.75c4.756 0 8.773 3.162 10.065 7.498a10.523 10.523 0 01-4.293 5.774M6.228 6.228L3 3m3.228 3.228l3.65 3.65m7.894 7.894L21 21m-3.228-3.228l-3.65-3.65m0 0a3 3 0 10-4.243-4.243m4.242 4.242L9.88 9.88" />
+                </svg>
+              } @else {
+                <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z" />
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                </svg>
+              }
+            </button>
+          </div>
+          @if (password.invalid && password.touched) {
+            <p class="text-red-400 text-xs mt-1.5">La contraseña es obligatoria.</p>
+          }
+        </div>
+
+        <button
+          type="submit"
+          [disabled]="cargando()"
+          class="w-full px-6 py-3.5 bg-gradient-to-r from-primary to-accent hover:from-primary-hover hover:to-accent text-white font-semibold rounded-xl shadow-lg hover:shadow-primary/30 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+        >
+          @if (cargando()) { Ingresando... } @else { Iniciar Sesión }
+        </button>
+      </form>
+
+      <p class="text-center text-sm text-zinc-400 mt-6 font-light">
+        ¿No tienes cuenta?
+        <a routerLink="/registro" class="text-primary hover:underline font-medium">Regístrate</a>
+      </p>
+    </div>
+  </main>
+
+  <app-modal-aviso-privacidad
+    [visible]="mostrarModalAviso()"
+    [mostrarBotonAceptar]="false"
+    (cerrar)="cerrarModalAviso()"
+  />
+</div>

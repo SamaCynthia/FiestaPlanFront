@@ -1,0 +1,23 @@
+<div class="min-h-screen flex flex-col justify-between selection:bg-primary selection:text-white">
+  <header role="banner" class="glass-panel sticky top-0 z-50 px-6 py-4 md:px-12 flex items-center justify-between">
+    <a routerLink="/" class="flex items-center gap-2">
+      <span class="text-2xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent tracking-tight">
+        FiestaPlan
+      </span>
+    </a>
+  </header>
+
+  <main role="main" class="flex-grow px-4 md:px-8 py-16 max-w-3xl mx-auto w-full">
+    <h1 class="text-3xl md:text-4xl font-extrabold text-white mb-8">
+      Aviso de Privacidad
+    </h1>
+
+    <div class="glass-panel p-6 md:p-8 rounded-2xl">
+      <app-aviso-privacidad-content />
+    </div>
+
+    <div class="mt-8">
+      <a routerLink="/" class="text-primary hover:underline text-sm">← Volver al inicio</a>
+    </div>
+  </main>
+</div>
