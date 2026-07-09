@@ -2,11 +2,12 @@ import { Component, OnInit, signal, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { AuditLogsService, AuditLog } from '../../core/services/audit-logs.service';
+import { Navbar } from '../../shared/navbar/navbar';
 
 @Component({
   selector: 'app-user-logs',
   standalone: true,
-  imports: [CommonModule, RouterLink],
+  imports: [CommonModule, RouterLink, Navbar],
   templateUrl: './logs.html',
   styleUrl: './logs.css'
 })

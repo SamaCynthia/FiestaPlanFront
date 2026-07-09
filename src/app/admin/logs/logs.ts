@@ -2,11 +2,12 @@ import { Component, OnInit, signal, computed, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { AuditLogsService, AuditLog } from '../../core/services/audit-logs.service';
+import { Navbar } from '../../shared/navbar/navbar';
 
 @Component({
   selector: 'app-admin-logs',
   standalone: true,
-  imports: [CommonModule, RouterLink],
+  imports: [CommonModule, RouterLink, Navbar],
   templateUrl: './logs.html',
   styleUrl: './logs.css'
 })
@@ -67,7 +68,7 @@ export class AdminLogs implements OnInit {
       // 1. Filtro por texto (Usuario, Acción, Descripción, IP, Endpoint)
       const correoUsuario = log.usuario?.correo?.toLowerCase() || '';
       const nombreUsuario = `${log.usuario?.nombres} ${log.usuario?.apellidos}`.toLowerCase();
-      const coincideTexto = !texto || 
+      const coincideTexto = !texto ||
         log.accion.toLowerCase().includes(texto) ||
         log.descripcion.toLowerCase().includes(texto) ||
         log.ip_origen.toLowerCase().includes(texto) ||
@@ -79,8 +80,8 @@ export class AdminLogs implements OnInit {
       const coincideModulo = modulo === 'todos' || log.modulo.toLowerCase() === modulo.toLowerCase();
 
       // 3. Filtro por estado (exitoso / fallido)
-      const coincideEstado = estado === 'todos' || 
-        (estado === 'exitoso' && log.exitoso) || 
+      const coincideEstado = estado === 'todos' ||
+        (estado === 'exitoso' && log.exitoso) ||
         (estado === 'fallido' && !log.exitoso);
 
       // 4. Filtro por método HTTP
@@ -100,12 +101,12 @@ export class AdminLogs implements OnInit {
 
   // Estadísticas computadas para el dashboard
   readonly totalRegistros = computed(() => this.allLogs().length);
-  
-  readonly totalExitosos = computed(() => 
+
+  readonly totalExitosos = computed(() =>
     this.allLogs().filter(l => l.exitoso).length
   );
-  
-  readonly totalFallidos = computed(() => 
+
+  readonly totalFallidos = computed(() =>
     this.allLogs().filter(l => !l.exitoso).length
   );
 
