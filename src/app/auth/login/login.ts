@@ -69,7 +69,7 @@ export class Login {
           if (res.rol === 'admin' || res.rol === 'moderador') {
             this.router.navigate(['/admin']);
           } else {
-            this.router.navigate(['/dashboard']);
+            this.router.navigate(['/']);
           }
         });
       },

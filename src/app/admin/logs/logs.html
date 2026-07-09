@@ -1,0 +1,425 @@
+<div class="min-h-screen flex flex-col justify-between selection:bg-primary selection:text-white">
+  <!-- Navbar de Administrador -->
+  <header role="banner" class="glass-panel sticky top-0 z-50 px-6 py-4 md:px-12 flex items-center justify-between">
+    <div class="flex items-center gap-2">
+      <span class="text-2xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent tracking-tight">
+        FiestaPlan Admin
+      </span>
+      <span class="px-2 py-0.5 text-xs font-semibold rounded-full bg-accent/20 text-accent border border-accent/30">
+        Auditoría Global
+      </span>
+    </div>
+    <nav role="navigation" aria-label="Menú principal" class="flex gap-4">
+      <a
+        routerLink="/"
+        class="glass-panel px-4 py-2 text-sm font-medium text-white hover:bg-white/10 hover:border-white/20 transition-all duration-200 focus-visible:outline-none"
+        aria-label="Volver al inicio"
+      >
+        Volver al Inicio
+      </a>
+    </nav>
+  </header>
+
+  <!-- Contenido Principal -->
+  <main role="main" class="flex-grow w-full max-w-7xl mx-auto px-4 py-12 md:py-16">
+    <!-- Encabezado y Botón de Recargar -->
+    <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-10">
+      <div>
+        <h1 class="text-3xl md:text-4xl font-extrabold tracking-tight text-white mb-2">
+          Panel de Auditoría del Sistema
+        </h1>
+        <p class="text-zinc-400 text-sm md:text-base font-light">
+          Consola centralizada para el monitoreo de privacidad, accesos y operaciones críticas de la plataforma FiestaPlan.
+        </p>
+      </div>
+      <div>
+        <button
+          (click)="cargarLogs()"
+          class="glass-panel glass-panel-hover px-5 py-3 text-white rounded-xl text-sm font-semibold flex items-center gap-2 cursor-pointer focus-visible:outline-none"
+          [disabled]="cargando()"
+        >
+          <span>🔄</span> Recargar Datos
+        </button>
+      </div>
+    </div>
+
+    <!-- Indicador de Carga -->
+    <div *ngIf="cargando()" class="flex flex-col items-center justify-center py-24">
+      <div class="w-12 h-12 border-4 border-primary/30 border-t-primary rounded-full animate-spin mb-4"></div>
+      <p class="text-zinc-400 font-light text-sm">Consultando logs del sistema...</p>
+    </div>
+
+    <!-- Mensaje de Error -->
+    <div *ngIf="error() && !cargando()" class="glass-panel border-rose-500/30 p-8 rounded-2xl text-center my-6 max-w-2xl mx-auto">
+      <span class="text-4xl block mb-2">⚠️</span>
+      <h3 class="text-lg font-bold text-white mb-2">Fallo de Autorización o Conexión</h3>
+      <p class="text-rose-400 font-light text-sm mb-6">{{ error() }}</p>
+      <button
+        (click)="cargarLogs()"
+        class="px-6 py-2.5 bg-rose-500 hover:bg-rose-600 text-white rounded-xl text-sm font-semibold transition-all duration-200 cursor-pointer"
+      >
+        Reintentar consulta
+      </button>
+    </div>
+
+    <div *ngIf="!cargando() && !error()" class="space-y-8">
+      <!-- Métrica Dashboard Grid -->
+      <section class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+        <!-- Tarjeta: Total Logs -->
+        <div class="glass-panel p-6 rounded-2xl flex flex-col justify-between">
+          <span class="text-xs font-semibold text-zinc-400 uppercase tracking-wider">Total de Acciones</span>
+          <div class="flex items-baseline gap-2 mt-2">
+            <span class="text-3xl font-extrabold text-white">{{ totalRegistros() }}</span>
+            <span class="text-xs text-zinc-500 font-light">registros</span>
+          </div>
+          <p class="text-[11px] text-zinc-500 mt-2 font-light">Historial total en base de datos.</p>
+        </div>
+
+        <!-- Tarjeta: Operaciones Exitosas -->
+        <div class="glass-panel p-6 rounded-2xl flex flex-col justify-between">
+          <span class="text-xs font-semibold text-emerald-400 uppercase tracking-wider">Éxitos</span>
+          <div class="flex items-baseline gap-2 mt-2">
+            <span class="text-3xl font-extrabold text-emerald-400">{{ totalExitosos() }}</span>
+            <span class="text-xs text-zinc-500 font-light">acciones</span>
+          </div>
+          <p class="text-[11px] text-zinc-500 mt-2 font-light">Operaciones procesadas sin error.</p>
+        </div>
+
+        <!-- Tarjeta: Fallos de Sistema -->
+        <div class="glass-panel p-6 rounded-2xl flex flex-col justify-between">
+          <span class="text-xs font-semibold text-rose-400 uppercase tracking-wider">Fallas / Errores</span>
+          <div class="flex items-baseline gap-2 mt-2">
+            <span class="text-3xl font-extrabold text-rose-400">{{ totalFallidos() }}</span>
+            <span class="text-xs text-zinc-500 font-light">eventos</span>
+          </div>
+          <p class="text-[11px] text-zinc-500 mt-2 font-light">Acciones denegadas o con errores.</p>
+        </div>
+
+        <!-- Tarjeta: Tasa de Éxito -->
+        <div class="glass-panel p-6 rounded-2xl flex flex-col justify-between">
+          <span class="text-xs font-semibold text-primary uppercase tracking-wider">Tasa de Efectividad</span>
+          <div class="flex items-baseline gap-2 mt-2">
+            <span class="text-3xl font-extrabold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">{{ tasaExito() }}%</span>
+          </div>
+          <p class="text-[11px] text-zinc-500 mt-2 font-light">Porcentaje de éxito general.</p>
+        </div>
+      </section>
+
+      <!-- Panel de Filtros -->
+      <section class="glass-panel p-5 rounded-2xl">
+        <h2 class="text-sm font-semibold text-zinc-400 uppercase tracking-wider mb-4">Filtros de Búsqueda</h2>
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          <!-- Búsqueda General -->
+          <div>
+            <label for="buscarTexto" class="block text-xs font-medium text-zinc-400 mb-1">Buscar por texto</label>
+            <input
+              id="buscarTexto"
+              type="text"
+              placeholder="Usuario, acción, IP, endpoint..."
+              class="glass-input w-full px-4 py-2.5 rounded-xl text-sm"
+              [value]="filtroTexto()"
+              (input)="actualizarTexto($event)"
+            />
+          </div>
+
+          <!-- Módulo -->
+          <div>
+            <label for="filtrarModulo" class="block text-xs font-medium text-zinc-400 mb-1">Módulo</label>
+            <select
+              id="filtrarModulo"
+              class="glass-input w-full px-4 py-2.5 rounded-xl text-sm cursor-pointer"
+              [value]="filtroModulo()"
+              (change)="actualizarModulo($event)"
+            >
+              <option value="todos">Todos los módulos</option>
+              <option value="auth">Autenticación</option>
+              <option value="perfil">Perfil</option>
+              <option value="api-adapter">API Adapter</option>
+              <option value="eventos">Eventos</option>
+            </select>
+          </div>
+
+          <!-- Estado -->
+          <div>
+            <label for="filtrarEstado" class="block text-xs font-medium text-zinc-400 mb-1">Estado</label>
+            <select
+              id="filtrarEstado"
+              class="glass-input w-full px-4 py-2.5 rounded-xl text-sm cursor-pointer"
+              [value]="filtroEstado()"
+              (change)="actualizarEstado($event)"
+            >
+              <option value="todos">Todos los estados</option>
+              <option value="exitoso">Solo Exitosos</option>
+              <option value="fallido">Solo Fallidos</option>
+            </select>
+          </div>
+
+          <!-- Método HTTP -->
+          <div>
+            <label for="filtrarMetodo" class="block text-xs font-medium text-zinc-400 mb-1">Método HTTP</label>
+            <select
+              id="filtrarMetodo"
+              class="glass-input w-full px-4 py-2.5 rounded-xl text-sm cursor-pointer"
+              [value]="filtroMetodo()"
+              (change)="actualizarMetodo($event)"
+            >
+              <option value="todos">Todos los métodos</option>
+              <option value="GET">GET</option>
+              <option value="POST">POST</option>
+              <option value="PATCH">PATCH / PUT</option>
+              <option value="DELETE">DELETE</option>
+            </select>
+          </div>
+        </div>
+      </section>
+
+      <!-- Tabla y Panel de Detalles -->
+      <div class="flex flex-col lg:flex-row gap-6">
+        <!-- Tabla de logs (colapso/ancho dinámico si hay detalle abierto) -->
+        <div class="flex-grow transition-all duration-300 w-full overflow-hidden" [ngClass]="logSeleccionado() ? 'lg:w-2/3' : 'w-full'">
+          <div class="glass-panel rounded-2xl overflow-x-auto border-zinc-800">
+            <table class="w-full text-left border-collapse" role="table">
+              <thead>
+                <tr class="border-b border-zinc-800 bg-white/2">
+                  <th class="p-4 text-xs font-semibold text-zinc-400 uppercase tracking-wider">Fecha / Hora</th>
+                  <th class="p-4 text-xs font-semibold text-zinc-400 uppercase tracking-wider">Usuario</th>
+                  <th class="p-4 text-xs font-semibold text-zinc-400 uppercase tracking-wider">Acción</th>
+                  <th class="p-4 text-xs font-semibold text-zinc-400 uppercase tracking-wider">Módulo</th>
+                  <th class="p-4 text-xs font-semibold text-zinc-400 uppercase tracking-wider">Método/URL</th>
+                  <th class="p-4 text-xs font-semibold text-zinc-400 uppercase tracking-wider">Estado</th>
+                  <th class="p-4 text-xs font-semibold text-zinc-400 uppercase tracking-wider text-right">Acciones</th>
+                </tr>
+              </thead>
+              <tbody>
+                <!-- Estado vacío de búsqueda -->
+                <tr *ngIf="logsFiltrados().length === 0">
+                  <td colspan="7" class="p-12 text-center text-zinc-400 font-light">
+                    No se encontraron registros que coincidan con los filtros establecidos.
+                  </td>
+                </tr>
+
+                <!-- Registros -->
+                <tr
+                  *ngFor="let log of logsPaginados()"
+                  class="border-b border-zinc-800/50 hover:bg-white/1 cursor-pointer transition-colors duration-150"
+                  (click)="seleccionarLog(log)"
+                  [ngClass]="{'bg-primary/5': logSeleccionado()?.id === log.id}"
+                >
+                  <td class="p-4 text-xs text-zinc-400 whitespace-nowrap">
+                    {{ formatearFecha(log.creado_en) }}
+                  </td>
+                  <td class="p-4 text-xs">
+                    <div *ngIf="log.usuario; else noUser">
+                      <span class="font-medium text-white block">{{ log.usuario.nombres }} {{ log.usuario.apellidos }}</span>
+                      <span class="text-zinc-500 text-[10px]">{{ log.usuario.correo }}</span>
+                    </div>
+                    <ng-template #noUser>
+                      <span class="text-zinc-500 text-[11px] font-mono">ID: {{ log.usuario_id || 'System/Anon' }}</span>
+                    </ng-template>
+                  </td>
+                  <td class="p-4 text-xs">
+                    <span class="px-2.5 py-0.5 font-semibold text-[10px] rounded bg-primary/10 text-primary border border-primary/20 uppercase tracking-wider">
+                      {{ log.accion }}
+                    </span>
+                  </td>
+                  <td class="p-4 text-xs text-zinc-300">
+                    {{ log.modulo }}
+                  </td>
+                  <td class="p-4 text-xs">
+                    <div class="flex items-center gap-1.5">
+                      <span [class]="obtenerMetodoBadgeClase(log.metodo_http)" class="px-1.5 py-0.5 rounded text-[9px] font-mono font-bold">
+                        {{ log.metodo_http }}
+                      </span>
+                      <code class="text-zinc-400 text-[11px] font-mono whitespace-nowrap overflow-hidden text-ellipsis max-w-[150px]" [title]="log.endpoint">
+                        {{ log.endpoint }}
+                      </code>
+                    </div>
+                  </td>
+                  <td class="p-4 text-xs">
+                    <span
+                      class="px-2 py-0.5 text-[10px] font-semibold rounded-full flex items-center justify-center gap-1 max-w-[80px]"
+                      [ngClass]="log.exitoso ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20' : 'bg-rose-500/10 text-rose-400 border border-rose-500/20'"
+                    >
+                      <span class="w-1.5 h-1.5 rounded-full" [ngClass]="log.exitoso ? 'bg-emerald-400' : 'bg-rose-400'"></span>
+                      {{ log.exitoso ? 'Éxito' : 'Fallo' }}
+                    </span>
+                  </td>
+                  <td class="p-4 text-xs text-right">
+                    <button
+                      (click)="seleccionarLog(log); $event.stopPropagation()"
+                      class="text-primary hover:text-primary-hover font-semibold px-2 py-1 focus-visible:outline-none"
+                    >
+                      Ver Detalle
+                    </button>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <!-- Paginación -->
+          <div *ngIf="logsFiltrados().length > 0" class="flex items-center justify-between mt-5 glass-panel px-4 py-3 rounded-2xl">
+            <span class="text-xs text-zinc-400 font-light">
+              Mostrando registros {{ (paginaActual() - 1) * itemsPorPagina + 1 }} al
+              {{ Math.min(paginaActual() * itemsPorPagina, logsFiltrados().length) }}
+              de {{ logsFiltrados().length }}
+            </span>
+            <div class="flex items-center gap-2">
+              <button
+                (click)="cambiarPagina(paginaActual() - 1)"
+                [disabled]="paginaActual() === 1"
+                class="px-3 py-1.5 text-xs font-medium rounded-lg border border-zinc-800 bg-zinc-900/50 text-zinc-400 hover:text-white disabled:opacity-30 disabled:pointer-events-none cursor-pointer focus-visible:outline-none"
+              >
+                Anterior
+              </button>
+              <span class="text-xs text-zinc-300 font-medium">Pág. {{ paginaActual() }} de {{ totalPaginas() }}</span>
+              <button
+                (click)="cambiarPagina(paginaActual() + 1)"
+                [disabled]="paginaActual() === totalPaginas()"
+                class="px-3 py-1.5 text-xs font-medium rounded-lg border border-zinc-800 bg-zinc-900/50 text-zinc-400 hover:text-white disabled:opacity-30 disabled:pointer-events-none cursor-pointer focus-visible:outline-none"
+              >
+                Siguiente
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Panel Lateral de Detalles (Se muestra al hacer click en un log) -->
+        <aside
+          *ngIf="logSeleccionado()"
+          role="complementary"
+          aria-label="Detalles del log seleccionado"
+          class="w-full lg:w-1/3 glass-panel p-6 rounded-2xl border-primary/20 flex flex-col justify-between shrink-0 animate-fade-in self-start sticky top-24"
+        >
+          <div>
+            <div class="flex items-center justify-between mb-6 pb-4 border-b border-zinc-800">
+              <h3 class="text-lg font-bold text-white">Detalle de Operación</h3>
+              <button
+                (click)="cerrarDetalles()"
+                class="w-6 h-6 rounded-full bg-zinc-800/80 text-zinc-400 hover:text-white flex items-center justify-center text-xs focus-visible:outline-none cursor-pointer"
+                title="Cerrar panel de detalles"
+              >
+                ✕
+              </button>
+            </div>
+
+            <!-- Campos detallados -->
+            <div class="space-y-4 text-xs">
+              <div>
+                <span class="text-zinc-500 block uppercase font-semibold text-[10px] tracking-wider mb-1">ID de Auditoría</span>
+                <span class="font-mono text-zinc-300 font-light">{{ logSeleccionado()?.id }}</span>
+              </div>
+
+              <div>
+                <span class="text-zinc-500 block uppercase font-semibold text-[10px] tracking-wider mb-1">Fecha de Registro</span>
+                <span class="text-zinc-300 font-light">{{ formatearFecha(logSeleccionado()!.creado_en) }}</span>
+              </div>
+
+              <div>
+                <span class="text-zinc-500 block uppercase font-semibold text-[10px] tracking-wider mb-1">Acción Ejecutada</span>
+                <span class="px-2.5 py-0.5 text-[10px] font-bold rounded bg-primary/20 text-primary border border-primary/30 uppercase tracking-wider inline-block">
+                  {{ logSeleccionado()?.accion }}
+                </span>
+              </div>
+
+              <div>
+                <span class="text-zinc-500 block uppercase font-semibold text-[10px] tracking-wider mb-1">Descripción</span>
+                <p class="text-zinc-200 leading-relaxed font-light">{{ logSeleccionado()?.descripcion }}</p>
+              </div>
+
+              <div>
+                <span class="text-zinc-500 block uppercase font-semibold text-[10px] tracking-wider mb-1">Usuario</span>
+                <div *ngIf="logSeleccionado()?.usuario; else anonDet">
+                  <span class="font-medium text-white block">{{ logSeleccionado()?.usuario?.nombres }} {{ logSeleccionado()?.usuario?.apellidos }}</span>
+                  <span class="text-zinc-400 block">{{ logSeleccionado()?.usuario?.correo }}</span>
+                  <span class="text-[10px] text-zinc-600 block font-mono">UUID: {{ logSeleccionado()?.usuario?.id }}</span>
+                </div>
+                <ng-template #anonDet>
+                  <span class="text-zinc-400 font-mono">ID de Usuario: {{ logSeleccionado()?.usuario_id || 'Servicio del Sistema' }}</span>
+                </ng-template>
+              </div>
+
+              <div class="pt-3 border-t border-zinc-800/50 space-y-3">
+                <div class="grid grid-cols-2 gap-3">
+                  <div>
+                    <span class="text-zinc-500 block uppercase font-semibold text-[10px] tracking-wider mb-1">Método HTTP</span>
+                    <span [class]="obtenerMetodoBadgeClase(logSeleccionado()!.metodo_http)" class="px-2 py-0.5 rounded text-[10px] font-mono font-bold inline-block">
+                      {{ logSeleccionado()?.metodo_http }}
+                    </span>
+                  </div>
+                  <div>
+                    <span class="text-zinc-500 block uppercase font-semibold text-[10px] tracking-wider mb-1">Código HTTP</span>
+                    <span
+                      class="px-2 py-0.5 rounded text-[10px] font-mono font-bold inline-block"
+                      [ngClass]="logSeleccionado()!.codigo_respuesta < 400 ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20' : 'bg-rose-500/10 text-rose-400 border border-rose-500/20'"
+                    >
+                      {{ logSeleccionado()?.codigo_respuesta }}
+                    </span>
+                  </div>
+                </div>
+
+                <div>
+                  <span class="text-zinc-500 block uppercase font-semibold text-[10px] tracking-wider mb-1">Ruta Endpoint</span>
+                  <code class="text-zinc-300 font-mono text-[11px] block bg-zinc-950/60 p-2 rounded-xl border border-zinc-800 break-all select-all">
+                    {{ logSeleccionado()?.endpoint }}
+                  </code>
+                </div>
+
+                <div class="grid grid-cols-2 gap-3">
+                  <div>
+                    <span class="text-zinc-500 block uppercase font-semibold text-[10px] tracking-wider mb-1">Dirección IP</span>
+                    <span class="font-mono text-zinc-300 font-light">{{ logSeleccionado()?.ip_origen }}</span>
+                  </div>
+                  <div>
+                    <span class="text-zinc-500 block uppercase font-semibold text-[10px] tracking-wider mb-1">Navegador / OS</span>
+                    <span class="text-zinc-300 font-light block overflow-hidden text-ellipsis whitespace-nowrap" [title]="logSeleccionado()?.user_agent">
+                      {{ obtenerBrowser(logSeleccionado()!.user_agent) }} ({{ obtenerPlataforma(logSeleccionado()!.user_agent) }})
+                    </span>
+                  </div>
+                </div>
+
+                <div *ngIf="logSeleccionado()?.entidad_tipo" class="grid grid-cols-2 gap-3">
+                  <div>
+                    <span class="text-zinc-500 block uppercase font-semibold text-[10px] tracking-wider mb-1">Entidad Tipo</span>
+                    <span class="text-zinc-300 font-light font-mono">{{ logSeleccionado()?.entidad_tipo }}</span>
+                  </div>
+                  <div>
+                    <span class="text-zinc-500 block uppercase font-semibold text-[10px] tracking-wider mb-1">Entidad ID</span>
+                    <span class="text-zinc-300 font-light font-mono block overflow-hidden text-ellipsis whitespace-nowrap" [title]="logSeleccionado()?.entidad_id">
+                      {{ logSeleccionado()?.entidad_id }}
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Sección específica de errores de ejecución -->
+              <div *ngIf="!logSeleccionado()?.exitoso && logSeleccionado()?.mensaje_error" class="pt-3 border-t border-rose-500/10">
+                <span class="text-rose-400 block uppercase font-bold text-[10px] tracking-wider mb-1">Detalle del Error</span>
+                <div class="bg-rose-500/5 border border-rose-500/10 p-3 rounded-xl">
+                  <p class="text-rose-400 font-mono text-[11px] leading-relaxed break-all select-all">{{ logSeleccionado()?.mensaje_error }}</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="mt-6 pt-4 border-t border-zinc-800 text-center">
+            <button
+              (click)="cerrarDetalles()"
+              class="w-full py-2 bg-zinc-800 hover:bg-zinc-700 text-white rounded-xl text-xs font-semibold transition-all duration-200 cursor-pointer focus-visible:outline-none"
+            >
+              Cerrar Panel
+            </button>
+          </div>
+        </aside>
+      </div>
+    </div>
+  </main>
+
+  <!-- Footer -->
+  <footer role="contentinfo" class="glass-panel mt-16 px-6 py-6 md:px-12 flex flex-col sm:flex-row items-center justify-between text-zinc-500 text-xs gap-4 border-t-0 border-x-0">
+    <p class="text-zinc-500">&copy; 2026 FiestaPlan. Todos los derechos reservados.</p>
+    <div class="flex gap-6">
+      <a routerLink="/legal/aviso-privacidad" class="hover:text-zinc-300 transition-colors duration-200 focus-visible:outline-none">Política de Privacidad</a>
+    </div>
+  </footer>
+</div>
