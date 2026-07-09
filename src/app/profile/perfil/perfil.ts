@@ -30,9 +30,9 @@ export class Perfil implements OnInit {
   private snapshotOriginal: Record<string, string> = {};
 
   readonly form = this.fb.group({
-    foto_perfil_url: [''],
-    telefono: [''],
-    ciudad_residencia: [''],
+    foto_perfil_url: ['', [Validators.maxLength(255), Validators.pattern(/^https?:\/\/.+$/i)]],
+    telefono: ['', [Validators.maxLength(15), Validators.pattern(/^[0-9+() -]*$/)]],
+    ciudad_residencia: ['', [Validators.maxLength(100), Validators.pattern(/^[a-zA-ZáéíóúÁÉÍÓÚñÑüÜ\s,.-]*$/)]],
     passwordNueva: ['', [Validators.minLength(8)]],
     passwordConfirmar: [''],
   }, { validators: this.passwordsCoinciden });

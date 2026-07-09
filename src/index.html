@@ -6,6 +6,19 @@
   <base href="/">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="icon" type="image/x-icon" href="favicon.ico">
+  <style id="antiClickjack">
+    body { display: none !important; }
+  </style>
+  <script type="text/javascript">
+    if (self === top) {
+      var antiClickjack = document.getElementById("antiClickjack");
+      if (antiClickjack) {
+        antiClickjack.parentNode.removeChild(antiClickjack);
+      }
+    } else {
+      top.location = self.location;
+    }
+  </script>
 </head>
 <body>
   <app-root></app-root>

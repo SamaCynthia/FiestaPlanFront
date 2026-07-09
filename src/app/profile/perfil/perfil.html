@@ -100,10 +100,19 @@
                 <input
                   id="foto_perfil_url"
                   type="url"
+                  maxlength="255"
                   formControlName="foto_perfil_url"
                   placeholder="https://ejemplo.com/mi-foto.jpg"
                   class="w-full px-4 py-3 rounded-xl bg-zinc-800/50 border border-zinc-700/50 text-white placeholder-zinc-500 focus:outline-none focus:border-primary transition-colors duration-200"
                 />
+                @if (foto_perfil_url.invalid && foto_perfil_url.touched) {
+                  @if (foto_perfil_url.errors?.['pattern']) {
+                    <p class="text-red-400 text-xs mt-1.5">Debe ser una URL válida (http:// o https://).</p>
+                  }
+                  @if (foto_perfil_url.errors?.['maxlength']) {
+                    <p class="text-red-400 text-xs mt-1.5">No puede exceder los 255 caracteres.</p>
+                  }
+                }
               </div>
 
               <div>
@@ -113,10 +122,20 @@
                 <input
                   id="telefono"
                   type="tel"
+                  maxlength="15"
                   formControlName="telefono"
                   autocomplete="tel"
+                  placeholder="Ej: +521234567890"
                   class="w-full px-4 py-3 rounded-xl bg-zinc-800/50 border border-zinc-700/50 text-white placeholder-zinc-500 focus:outline-none focus:border-primary transition-colors duration-200"
                 />
+                @if (telefono.invalid && telefono.touched) {
+                  @if (telefono.errors?.['pattern']) {
+                    <p class="text-red-400 text-xs mt-1.5">Formato de teléfono inválido (solo números y caracteres + - ( )).</p>
+                  }
+                  @if (telefono.errors?.['maxlength']) {
+                    <p class="text-red-400 text-xs mt-1.5">No puede exceder los 15 caracteres.</p>
+                  }
+                }
               </div>
 
               <div>
@@ -126,10 +145,20 @@
                 <input
                   id="ciudad_residencia"
                   type="text"
+                  maxlength="100"
                   formControlName="ciudad_residencia"
                   autocomplete="address-level2"
+                  placeholder="Ej: CDMX"
                   class="w-full px-4 py-3 rounded-xl bg-zinc-800/50 border border-zinc-700/50 text-white placeholder-zinc-500 focus:outline-none focus:border-primary transition-colors duration-200"
                 />
+                @if (ciudad_residencia.invalid && ciudad_residencia.touched) {
+                  @if (ciudad_residencia.errors?.['pattern']) {
+                    <p class="text-red-400 text-xs mt-1.5">Debe ser un nombre de ciudad válido.</p>
+                  }
+                  @if (ciudad_residencia.errors?.['maxlength']) {
+                    <p class="text-red-400 text-xs mt-1.5">No puede exceder los 100 caracteres.</p>
+                  }
+                }
               </div>
 
               <div class="pt-2 border-t border-zinc-800">
