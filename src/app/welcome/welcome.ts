@@ -3,11 +3,12 @@ import { CommonModule } from '@angular/common';
 import { RouterLink, Router } from '@angular/router';
 import Swal from 'sweetalert2';
 import { AuthService } from '../core/services/auth.service';
+import { Navbar } from '../shared/navbar/navbar';
 
 @Component({
   selector: 'app-welcome',
   standalone: true,
-  imports: [CommonModule, RouterLink],
+  imports: [CommonModule, Navbar],
   templateUrl: './welcome.html',
   styleUrl: './welcome.css'
 })
@@ -48,46 +49,5 @@ export class Welcome implements OnInit {
         error: () => console.log('Usuario no autenticado (sesión limpia).')
       });
     }
-  }
-
-  logout(): void {
-    Swal.fire({
-      title: '¿Cerrar Sesión?',
-      text: '¿Estás seguro de que deseas salir de FiestaPlan?',
-      icon: 'question',
-      showCancelButton: true,
-      confirmButtonColor: '#6366f1',
-      cancelButtonColor: '#3f3f46',
-      confirmButtonText: 'Sí, salir',
-      cancelButtonText: 'Cancelar',
-      background: '#18181b',
-      color: '#fff',
-    }).then((result) => {
-      if (result.isConfirmed) {
-        this.authService.logout().subscribe({
-          next: () => {
-            Swal.fire({
-              icon: 'success',
-              title: 'Sesión Cerrada',
-              text: 'Has cerrado sesión con éxito.',
-              confirmButtonColor: '#6366f1',
-              background: '#18181b',
-              color: '#fff',
-              timer: 1500,
-              showConfirmButton: false,
-            }).then(() => {
-              this.router.navigate(['/']);
-            });
-          },
-          error: (err) => {
-            console.error('Error al cerrar sesión:', err);
-            // Even if the request fails, let's reset client signals
-            this.authService.rolActual.set(null);
-            this.authService.estaAutenticado.set(false);
-            this.router.navigate(['/']);
-          }
-        });
-      }
-    });
   }
 }
