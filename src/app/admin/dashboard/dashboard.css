@@ -1,0 +1,5 @@
+/* Styling for Admin Dashboard */
+
+.group:hover {
+  border-color: rgba(236, 72, 153, 0.3) !important; /* accent border hover */
+}

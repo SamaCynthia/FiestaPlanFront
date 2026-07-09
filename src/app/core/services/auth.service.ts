@@ -26,6 +26,8 @@ export interface AuthResponse {
 export class AuthService {
   private readonly apiUrl = 'http://localhost:3000/auth';
 
+  private readonly perfilUrl = 'http://localhost:3000/perfil';
+
   readonly rolActual = signal<string | null>(null);
   readonly estaAutenticado = signal<boolean>(false);
 
@@ -44,6 +46,23 @@ export class AuthService {
         this.rolActual.set(res.rol);
         this.estaAutenticado.set(true);
       }),
+    );
+  }
+
+  cargarPerfil(): Observable<any> {
+    return this.http.get<any>(this.perfilUrl).pipe(
+      tap({
+        next: (res) => {
+          // If response has rol (e.g. res.rol or res.rol.nombre), set it. Let's handle both.
+          const rol = typeof res.rol === 'object' && res.rol ? res.rol.nombre : res.rol;
+          this.rolActual.set(rol || 'usuario');
+          this.estaAutenticado.set(true);
+        },
+        error: () => {
+          this.rolActual.set(null);
+          this.estaAutenticado.set(false);
+        }
+      })
     );
   }
 
