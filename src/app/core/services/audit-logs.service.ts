@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { environment } from '../../environments/environment';
 
 export interface AuditLog {
   id: string;
@@ -30,7 +31,7 @@ export interface AuditLog {
   providedIn: 'root',
 })
 export class AuditLogsService {
-  private readonly baseUrl = 'http://localhost:3000/perfil';
+  private readonly baseUrl = `${environment.apiUrl}/perfil`;
 
   constructor(private http: HttpClient) {}
 

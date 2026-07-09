@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { environment } from '../../environments/environment';
 
 export interface PerfilUsuario {
   uuid: string;
@@ -19,7 +20,7 @@ export interface PerfilUsuario {
 
 @Injectable({ providedIn: 'root' })
 export class UsersService {
-  private readonly apiUrl = 'http://localhost:3000/perfil';
+  private readonly apiUrl = `${environment.apiUrl}/perfil`;
 
   constructor(private http: HttpClient) {}
 
