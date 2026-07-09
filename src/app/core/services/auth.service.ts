@@ -1,6 +1,7 @@
 import { Injectable, signal } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, tap } from 'rxjs';
+import { environment } from '../../environments/environment';
 
 export interface RegisterPayload {
   nombres: string;
@@ -24,9 +25,9 @@ export interface AuthResponse {
 
 @Injectable({ providedIn: 'root' })
 export class AuthService {
-  private readonly apiUrl = 'http://localhost:3000/auth';
+  private readonly apiUrl = `${environment.apiUrl}/auth`;
 
-  private readonly perfilUrl = 'http://localhost:3000/perfil';
+  private readonly perfilUrl = `${environment.apiUrl}/perfil`;
 
   readonly rolActual = signal<string | null>(null);
   readonly estaAutenticado = signal<boolean>(false);
