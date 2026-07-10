@@ -1,0 +1,7 @@
+/* Custom styling for User Activity Logs page */
+
+/* Smooth glow hover for timeline connectors */
+.group:hover::after {
+  background-color: var(--color-primary);
+  box-shadow: 0 0 8px var(--color-primary);
+}
