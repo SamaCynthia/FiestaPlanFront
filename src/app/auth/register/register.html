@@ -10,8 +10,8 @@
       >
     </a>
     <nav class="flex gap-4">
-      <a
-        routerLink="/login"
+
+      <a  routerLink="/login"
         class="px-4 py-2 text-sm font-medium text-zinc-300 hover:text-white transition-colors duration-200"
         >Iniciar Sesión</a
       >
@@ -38,11 +38,23 @@
               type="text"
               formControlName="nombres"
               autocomplete="given-name"
+              maxlength="100"
+              (input)="capitalizarPrimeraLetra('nombres', $event)"
               class="w-full px-4 py-3 rounded-xl bg-zinc-800/50 border border-zinc-700/50 text-white placeholder-zinc-500 focus:outline-none focus:border-primary transition-colors duration-200"
               placeholder="Nombre"
             />
             @if (nombres.invalid && nombres.touched) {
-              <p class="text-red-400 text-xs mt-1.5">Requerido</p>
+              <p class="text-red-400 text-xs mt-1.5">
+                @if (nombres.errors?.['required']) {
+                  Requerido.
+                } @else if (nombres.errors?.['minlength']) {
+                  Mínimo 2 caracteres.
+                } @else if (nombres.errors?.['maxlength']) {
+                  Máximo 100 caracteres.
+                } @else if (nombres.errors?.['pattern']) {
+                  Solo letras; cada palabra debe iniciar con mayúscula.
+                }
+              </p>
             }
           </div>
 
@@ -55,11 +67,23 @@
               type="text"
               formControlName="apellidos"
               autocomplete="family-name"
+              maxlength="100"
+              (input)="capitalizarPrimeraLetra('apellidos', $event)"
               class="w-full px-4 py-3 rounded-xl bg-zinc-800/50 border border-zinc-700/50 text-white placeholder-zinc-500 focus:outline-none focus:border-primary transition-colors duration-200"
               placeholder="Apellido"
             />
             @if (apellidos.invalid && apellidos.touched) {
-              <p class="text-red-400 text-xs mt-1.5">Requerido</p>
+              <p class="text-red-400 text-xs mt-1.5">
+                @if (apellidos.errors?.['required']) {
+                  Requerido.
+                } @else if (apellidos.errors?.['minlength']) {
+                  Mínimo 2 caracteres.
+                } @else if (apellidos.errors?.['maxlength']) {
+                  Máximo 100 caracteres.
+                } @else if (apellidos.errors?.['pattern']) {
+                  Solo letras; cada palabra debe iniciar con mayúscula.
+                }
+              </p>
             }
           </div>
         </div>
@@ -82,6 +106,8 @@
                 El correo es obligatorio.
               } @else if (correo.errors?.['email']) {
                 Ingresa un correo válido.
+              } @else if (correo.errors?.['maxlength']) {
+                Máximo 255 caracteres.
               }
             </p>
           }
@@ -98,7 +124,15 @@
             class="w-full px-4 py-3 rounded-xl bg-zinc-800/50 border border-zinc-700/50 text-white placeholder-zinc-500 focus:outline-none focus:border-primary transition-colors duration-200"
           />
           @if (fecha_nacimiento.invalid && fecha_nacimiento.touched) {
-            <p class="text-red-400 text-xs mt-1.5">Este campo es obligatorio.</p>
+            <p class="text-red-400 text-xs mt-1.5">
+              @if (fecha_nacimiento.errors?.['required']) {
+                Este campo es obligatorio.
+              } @else if (fecha_nacimiento.errors?.['fechaFutura']) {
+                La fecha no puede ser futura.
+              } @else if (fecha_nacimiento.errors?.['edadMinima']) {
+                Debes tener al menos 13 años para registrarte.
+              }
+            </p>
           }
         </div>
 
@@ -127,9 +161,15 @@
             type="tel"
             formControlName="telefono"
             autocomplete="tel"
+            inputmode="numeric"
+            maxlength="10"
+            (input)="soloNumeros($event)"
             class="w-full px-4 py-3 rounded-xl bg-zinc-800/50 border border-zinc-700/50 text-white placeholder-zinc-500 focus:outline-none focus:border-primary transition-colors duration-200"
-            placeholder="XXXX XXX XXXX"
+            placeholder="10 dígitos, solo números"
           />
+          @if (telefono.invalid && telefono.touched) {
+            <p class="text-red-400 text-xs mt-1.5">Debe contener exactamente 10 dígitos numéricos.</p>
+          }
         </div>
 
         <div>
@@ -141,9 +181,22 @@
             type="text"
             formControlName="ciudad_residencia"
             autocomplete="address-level2"
+            maxlength="100"
+            (input)="capitalizarPrimeraLetra('ciudad_residencia', $event)"
             class="w-full px-4 py-3 rounded-xl bg-zinc-800/50 border border-zinc-700/50 text-white placeholder-zinc-500 focus:outline-none focus:border-primary transition-colors duration-200"
             placeholder="Ciudad de residencia"
           />
+          @if (ciudad_residencia.invalid && ciudad_residencia.touched) {
+            <p class="text-red-400 text-xs mt-1.5">
+              @if (ciudad_residencia.errors?.['minlength']) {
+                Mínimo 2 caracteres.
+              } @else if (ciudad_residencia.errors?.['maxlength']) {
+                Máximo 100 caracteres.
+              } @else if (ciudad_residencia.errors?.['pattern']) {
+                Solo letras; cada palabra debe iniciar con mayúscula.
+              }
+            </p>
+          }
         </div>
 
         <div>
@@ -203,12 +256,33 @@
               }
             </button>
           </div>
+
+          <!-- Checklist en vivo de requisitos de contraseña -->
+          @if (password.value) {
+            <ul class="mt-2 space-y-1 text-xs">
+              <li class="flex items-center gap-1.5" [class.text-emerald-400]="passwordTieneLongitud" [class.text-zinc-500]="!passwordTieneLongitud">
+                <span>{{ passwordTieneLongitud ? '✓' : '✗' }}</span>
+                <span>Entre 8 y 72 caracteres</span>
+              </li>
+              <li class="flex items-center gap-1.5" [class.text-emerald-400]="passwordTieneMayuscula" [class.text-zinc-500]="!passwordTieneMayuscula">
+                <span>{{ passwordTieneMayuscula ? '✓' : '✗' }}</span>
+                <span>Al menos una letra mayúscula</span>
+              </li>
+              <li class="flex items-center gap-1.5" [class.text-emerald-400]="passwordTieneMinuscula" [class.text-zinc-500]="!passwordTieneMinuscula">
+                <span>{{ passwordTieneMinuscula ? '✓' : '✗' }}</span>
+                <span>Al menos una letra minúscula</span>
+              </li>
+              <li class="flex items-center gap-1.5" [class.text-emerald-400]="passwordTieneNumero" [class.text-zinc-500]="!passwordTieneNumero">
+                <span>{{ passwordTieneNumero ? '✓' : '✗' }}</span>
+                <span>Al menos un número</span>
+              </li>
+            </ul>
+          }
+
           @if (password.invalid && password.touched) {
             <p class="text-red-400 text-xs mt-1.5">
               @if (password.errors?.['required']) {
                 La contraseña es obligatoria.
-              } @else if (password.errors?.['minlength']) {
-                Debe tener al menos 8 caracteres.
               }
             </p>
           }
